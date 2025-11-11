@@ -126,6 +126,28 @@ def format_prompts(
     # Hint: The chat template transforms messages into the model's expected format
     # (e.g., "<|im_start|>user\n{content}<|im_end|>" for Qwen models)
     # =======================================================================
+    for question in questions:
+        if use_few_shot:
+            formatted_prompt = FEW_SHOT_PROMPT.format(question=question)
+        else:
+            formatted_prompt = ZERO_SHOT_PROMPT.format(question=question)
+        
+        if use_chat_template and tokenizer is not None:
+            message = []
+            if system_message is not None:
+                message.append({"role": "system", "content": system_message})
+            message.append({"role": "user", "content": formatted_prompt})
+            try:
+                formatted_prompt = tokenizer.apply_chat_template(
+                    message,
+                    tokenize=False,
+                    add_generation_prompt=True
+                )
+            except Exception as e:
+                print(f"Warning: Model does not support chat template: {e}")
+
+        formatted_prompts.append(formatted_prompt)
+
     return formatted_prompts
 
 
@@ -237,6 +259,23 @@ def run_inference(
     # Hint: Check the VLLM documentation for LLM and SamplingParams classes
     # can refer to https://docs.vllm.ai/en/stable/getting_started/quickstart.html
     # =======================================================================
+    llm = LLM(
+        model=model_path,
+        tensor_parallel_size=tensor_parallel_size,
+        gpu_memory_utilization=gpu_memory_utilization
+        # trust_remote_code=True
+    )
+    sampling_params = SamplingParams(
+        temperature=temperature,
+        top_p=top_p,
+        top_k=top_k,
+        max_tokens=max_tokens,
+        n=n_rollouts
+    )
+    outputs = llm.generate(
+        prompts=formatted_prompts,
+        sampling_params=sampling_params
+    )
 
 
     # Save results
