@@ -423,7 +423,7 @@ class LoRAAdapterManager:
         #
         # Hint: Look at the imports at the top of this file
         # =======================================================================
-
+        self.model = get_peft_model(self.model, lora_config)
         return self.model
 
     def _resolve_lora_target_modules(self) -> List[str]:
@@ -459,9 +459,28 @@ class LoRAAdapterManager:
             List of module names to apply LoRA to (e.g., ["q_proj", "k_proj", "v_proj"])
         """
         # ==================== TODO: Implement this method ====================
-
+        # 1.
+        linear_layer_names = set()
+        for name, module in self.model.named_modules():
+            if isinstance(module, nn.Linear):
+                layer_name = name.split(".")[-1]
+                linear_layer_names.add(layer_name)
+        # 2. 
+        model_type = self.model.config.model_type
+        # 3. 
+        valid_targets = []
+        if "qwen" in model_type.lower():
+            candidates = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+            # 4. 
+            for candidate in candidates:
+                if candidate in linear_layer_names:
+                    valid_targets.append(candidate)
+        else:
+            rank0_print(f'Not a Qwen model, found model_type: {model_type}.')
+            valid_targets = list(linear_layer_names)
+        # 5. 
         # =====================================================================
-        valid_targets = []  # Replace with your implementation
+        # valid_targets = []  # Replace with your implementation
         return valid_targets
 
 
