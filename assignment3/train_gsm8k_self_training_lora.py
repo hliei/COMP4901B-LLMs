@@ -424,6 +424,12 @@ class LoRAAdapterManager:
         # Hint: Look at the imports at the top of this file
         # =======================================================================
         self.model = get_peft_model(self.model, lora_config)
+
+        # Add these lines to fix gradient checkpointing with PEFT
+        if self.training_args.gradient_checkpointing:
+            self.model.enable_input_require_grads() # Enable gradients for inputs during checkpoint recomputation
+            self.model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False}) # Use non-reentrant for stability
+
         return self.model
 
     def _resolve_lora_target_modules(self) -> List[str]:
@@ -459,6 +465,11 @@ class LoRAAdapterManager:
             List of module names to apply LoRA to (e.g., ["q_proj", "k_proj", "v_proj"])
         """
         # ==================== TODO: Implement this method ====================
+        # Step 0: Check if user specified target modules via command line
+        if self.lora_args.lora_target_modules is not None:
+            user_specified = [m.strip() for m in self.lora_args.lora_target_modules.split(',')]
+            rank0_print(f"Using user-specified LoRA target modules: {user_specified}")
+            return user_specified
         # 1.
         linear_layer_names = set()
         for name, module in self.model.named_modules():

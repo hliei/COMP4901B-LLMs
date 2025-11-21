@@ -141,7 +141,8 @@ def format_prompts(
                 formatted_prompt = tokenizer.apply_chat_template(
                     message,
                     tokenize=False,
-                    add_generation_prompt=True
+                    add_generation_prompt=True,
+                    enable_thinking=enable_thinking
                 )
             except Exception as e:
                 print(f"Warning: Model does not support chat template: {e}")
