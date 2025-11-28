@@ -1,17 +1,12 @@
 """
-Search-augmented LLM Agent for Question Answering.
-
-This module implements an agent that can:
-1. Reason about questions
-2. Search for information using Google Search
-3. Iterate through multiple search steps
-4. Synthesize final answers
+Search-augmented LLM Agent for Question Answering. (Mainly for Part I)
++ Browsing functionality included as BONUS in Part I.
 """
 
 import json
 from typing import List, Dict, Any, Optional, Tuple
 from src.llm_client import DeepSeekClient
-from src.search_tool import google_search, format_search_results
+from src.search_tools.search_tool import google_search, format_search_results
 
 # Load environment variables from .env
 from src.utils import load_env
@@ -19,7 +14,7 @@ load_env()
 
 # Import browsing tool (lazy import to avoid dependency issues)
 try:
-    from src.browsing_tool import browse_webpage, format_browse_result
+    from src.search_tools.browsing_tool import browse_webpage, format_browse_result
     BROWSING_AVAILABLE = True
 except ImportError:
     BROWSING_AVAILABLE = False
