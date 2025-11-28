@@ -45,6 +45,8 @@ results/*.jsonl
 !results/prediction_example.jsonl
 !results/trajectories_example.jsonl
 grading_results*.json
+credentials.json
+token.json
 
 # Logs
 *.log
