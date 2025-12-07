@@ -1,0 +1,19 @@
+{
+  "total_count": 120,
+  "correct_count": 74,
+  "accuracy": 0.6166666666666667,
+  "num_problems": 30,
+  "avg_rollouts_per_problem": 4.0,
+  "pass_at_k": {
+    "pass@1": 0.6166666666666667,
+    "pass@2": 0.7277777777777777,
+    "pass@3": 0.7916666666666666,
+    "pass@4": 0.8333333333333334
+  },
+  "k_values": [
+    1,
+    2,
+    3,
+    4
+  ]
+}
